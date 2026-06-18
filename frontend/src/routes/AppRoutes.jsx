@@ -15,6 +15,12 @@ import ForgotPassword from '../pages/Auth/ForgotPassword';
 import ResetPassword from '../pages/Auth/ResetPassword';
 import Dashboard from '../pages/Dashboard';
 
+// Users pages
+import UserList from '../pages/Users/UserList';
+import CreateUser from '../pages/Users/CreateUser';
+import EditUser from '../pages/Users/EditUser';
+import ViewUser from '../pages/Users/ViewUser';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -31,6 +37,10 @@ const AppRoutes = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/users" element={<UserList />} />
+          <Route path="/users/create" element={<CreateUser />} />
+          <Route path="/users/:id/edit" element={<EditUser />} />
+          <Route path="/users/:id" element={<ViewUser />} />
         </Route>
       </Route>
 
