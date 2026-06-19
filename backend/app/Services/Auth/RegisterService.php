@@ -15,6 +15,8 @@ class RegisterService
     public function register(array $data): User
     {
         $data['password'] = Hash::make($data['password']);
-        return $this->authRepository->create($data);
+        $user = $this->authRepository->create($data);
+        $user->assignRole('User');
+        return $user;
     }
 }

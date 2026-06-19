@@ -29,6 +29,9 @@ const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView 
             >
               Email Address{renderSortIndicator('email')}
             </th>
+            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
+              Role
+            </th>
             <th
               onClick={() => onSort('created_at')}
               className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 select-none"
@@ -43,7 +46,7 @@ const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView 
         <tbody className="bg-white divide-y divide-slate-200 text-sm text-slate-700">
           {users.length === 0 ? (
             <tr>
-              <td colSpan="5" className="px-6 py-10 text-center text-slate-400">
+              <td colSpan="6" className="px-6 py-10 text-center text-slate-400">
                 No users found.
               </td>
             </tr>
@@ -58,6 +61,17 @@ const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView 
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {user.email}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                    user.roles && user.roles[0]?.name === 'Super Admin'
+                      ? 'bg-red-50 text-red-700 border border-red-100'
+                      : user.roles && user.roles[0]?.name === 'Admin'
+                      ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                      : 'bg-slate-100 text-slate-700 border border-slate-200'
+                  }`}>
+                    {user.roles && user.roles[0]?.name || 'Employee'}
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
                   {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}

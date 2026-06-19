@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import useAuth from '../../hooks/useAuth';
+import roleService from '../../services/roleService';
 
 const UserForm = ({ initialData, onSubmit, loading, error, isEdit }) => {
+  const { hasRole } = useAuth();
+  const { roles } = useSelector((state) => state.role);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Employee');
   const [validationErrors, setValidationErrors] = useState({});
+
+  useEffect(() => {
+    roleService.fetchRoles();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || '');
       setEmail(initialData.email || '');
+      if (initialData.roles && initialData.roles.length > 0) {
+        setRole(initialData.roles[0].name);
+      }
     }
   }, [initialData]);
 
@@ -34,7 +47,7 @@ const UserForm = ({ initialData, onSubmit, loading, error, isEdit }) => {
     e.preventDefault();
     if (!validate()) return;
     
-    const payload = { name, email };
+    const payload = { name, email, role };
     if (password) {
       payload.password = password;
     }
@@ -95,6 +108,26 @@ const UserForm = ({ initialData, onSubmit, loading, error, isEdit }) => {
         {validationErrors.password && (
           <p className="text-red-500 text-xs mt-1">{validationErrors.password}</p>
         )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-600 mb-1">Role</label>
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-white"
+          disabled={loading}
+        >
+          {roles.length === 0 && <option value="Employee">Employee</option>}
+          {(hasRole('Super Admin')
+            ? roles
+            : roles.filter((r) => r.name === 'Employee' || r.name === 'User')
+          ).map((r) => (
+            <option key={r.id} value={r.name}>
+              {r.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <button

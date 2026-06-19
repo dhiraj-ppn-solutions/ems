@@ -3,7 +3,7 @@ import { Outlet, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 const MainLayout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -12,7 +12,15 @@ const MainLayout = () => {
           <Link to="/" className="text-xl font-bold text-indigo-600">EMS Portal</Link>
           <div className="hidden md:flex items-center gap-4">
             <Link to="/" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Dashboard</Link>
-            <Link to="/users" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Users</Link>
+            {hasPermission('manage-users') && (
+              <Link to="/users" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Users</Link>
+            )}
+            {hasPermission('manage-roles') && (
+              <Link to="/roles" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Roles</Link>
+            )}
+            {hasPermission('manage-permissions') && (
+              <Link to="/permissions" className="text-sm font-medium text-slate-600 hover:text-indigo-600">Permissions</Link>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-4">

@@ -8,6 +8,6 @@ class MeService
 {
     public function getProfile(User $user): User
     {
-        return $user;
+        return $user->load(['roles.permissions', 'permissions']);
     }
 }

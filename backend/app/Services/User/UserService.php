@@ -30,13 +30,44 @@ class UserService
 
     public function createUser(array $data): User
     {
+        $role = $data['role'] ?? 'Employee';
+        unset($data['role']);
+
+        $currentUser = auth()->user();
+        if ($currentUser) {
+            if ($role === 'Super Admin' && !$currentUser->hasRole('Super Admin')) {
+                throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("You do not have permission to assign the Super Admin role.");
+            }
+            if ($role === 'Admin' && !$currentUser->hasRole('Super Admin')) {
+                throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("You do not have permission to assign the Admin role.");
+            }
+        }
+
         $data['password'] = Hash::make($data['password']);
-        return $this->userRepository->create($data);
+        $user = $this->userRepository->create($data);
+        $user->assignRole($role);
+
+        return $user->load('roles');
     }
 
     public function updateUser(int $id, array $data): User
     {
         $user = $this->getUser($id);
+
+        $role = $data['role'] ?? null;
+        unset($data['role']);
+
+        if ($role !== null) {
+            $currentUser = auth()->user();
+            if ($currentUser) {
+                if ($role === 'Super Admin' && !$currentUser->hasRole('Super Admin')) {
+                    throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("You do not have permission to assign the Super Admin role.");
+                }
+                if ($role === 'Admin' && !$currentUser->hasRole('Super Admin')) {
+                    throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("You do not have permission to assign the Admin role.");
+                }
+            }
+        }
 
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -44,12 +75,28 @@ class UserService
             unset($data['password']);
         }
 
-        return $this->userRepository->update($user, $data);
+        $user = $this->userRepository->update($user, $data);
+
+        if ($role !== null) {
+            $user->syncRoles([$role]);
+        }
+
+        return $user->load('roles');
     }
 
     public function deleteUser(int $id): void
     {
         $user = $this->getUser($id);
+        $currentUser = auth()->user();
+
+        if ($currentUser && $currentUser->id === $user->id) {
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("You cannot delete your own account.");
+        }
+
+        if ($user->hasRole('Super Admin') && (!$currentUser || !$currentUser->hasRole('Super Admin'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("You do not have permission to delete a Super Admin.");
+        }
+
         $this->userRepository->delete($user);
     }
 }

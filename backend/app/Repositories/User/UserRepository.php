@@ -9,7 +9,7 @@ class UserRepository
 {
     public function getAllPaginated(array $filters, int $perPage = 10): LengthAwarePaginator
     {
-        $query = User::query();
+        $query = User::query()->with('roles');
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -33,7 +33,7 @@ class UserRepository
 
     public function findById(int $id): ?User
     {
-        return User::find($id);
+        return User::with('roles')->find($id);
     }
 
     public function create(array $data): User

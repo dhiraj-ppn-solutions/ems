@@ -21,6 +21,16 @@ import CreateUser from '../pages/Users/CreateUser';
 import EditUser from '../pages/Users/EditUser';
 import ViewUser from '../pages/Users/ViewUser';
 
+// Roles pages
+import RoleList from '../pages/Roles/RoleList';
+import CreateRole from '../pages/Roles/CreateRole';
+import EditRole from '../pages/Roles/EditRole';
+
+// Permissions pages
+import PermissionList from '../pages/Permissions/PermissionList';
+import CreatePermission from '../pages/Permissions/CreatePermission';
+import EditPermission from '../pages/Permissions/EditPermission';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -41,6 +51,16 @@ const AppRoutes = () => {
           <Route path="/users/create" element={<CreateUser />} />
           <Route path="/users/:id/edit" element={<EditUser />} />
           <Route path="/users/:id" element={<ViewUser />} />
+
+          {/* Roles */}
+          <Route path="/roles" element={<RoleList />} />
+          <Route path="/roles/create" element={<CreateRole />} />
+          <Route path="/roles/:id/edit" element={<EditRole />} />
+
+          {/* Permissions */}
+          <Route path="/permissions" element={<PermissionList />} />
+          <Route path="/permissions/create" element={<CreatePermission />} />
+          <Route path="/permissions/:id/edit" element={<EditPermission />} />
         </Route>
       </Route>
 

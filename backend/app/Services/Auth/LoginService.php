@@ -24,6 +24,8 @@ class LoginService
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $user->load(['roles.permissions', 'permissions']);
+
         return [
             'user' => $user,
             'token' => $token,

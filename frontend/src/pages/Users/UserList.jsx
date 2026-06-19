@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 import { fetchUsersThunk, deleteUserThunk } from '../../store/user/userThunk';
 import UserTable from '../../components/User/UserTable';
 import UserSearch from '../../components/User/UserSearch';
@@ -10,7 +11,12 @@ import UserDeleteModal from '../../components/User/UserDeleteModal';
 const UserList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { hasPermission, loading: authLoading } = useAuth();
   const { users, loading, pagination } = useSelector((state) => state.user);
+
+  if (!authLoading && !hasPermission('manage-users')) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   // Filter and pagination states
   const [search, setSearch] = useState('');
@@ -64,12 +70,16 @@ const UserList = () => {
 
   const handleDeleteConfirm = async () => {
     if (deleteTargetId) {
-      await dispatch(deleteUserThunk(deleteTargetId));
-      setIsDeleteOpen(false);
-      setDeleteTargetId(null);
-      setDeleteTargetName('');
-      // Re-fetch users to verify pagination details recalculate
-      dispatch(fetchUsersThunk({ search, sort_by: sortBy, sort_order: sortOrder, page }));
+      const resultAction = await dispatch(deleteUserThunk(deleteTargetId));
+      if (deleteUserThunk.rejected.match(resultAction)) {
+        alert(resultAction.payload || 'Failed to delete user');
+      } else {
+        setIsDeleteOpen(false);
+        setDeleteTargetId(null);
+        setDeleteTargetName('');
+        // Re-fetch users to verify pagination details recalculate
+        dispatch(fetchUsersThunk({ search, sort_by: sortBy, sort_order: sortOrder, page }));
+      }
     }
   };
 
