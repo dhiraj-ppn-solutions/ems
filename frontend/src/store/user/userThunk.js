@@ -5,6 +5,7 @@ import {
   createUserApi,
   updateUserApi,
   deleteUserApi,
+  assignUserRoleApi,
 } from '../../api/userApi';
 
 export const fetchUsersThunk = createAsyncThunk(
@@ -72,6 +73,20 @@ export const deleteUserThunk = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to delete user'
+      );
+    }
+  }
+);
+
+export const assignUserRoleThunk = createAsyncThunk(
+  'user/assignRole',
+  async ({ id, role }, { rejectWithValue }) => {
+    try {
+      const data = await assignUserRoleApi(id, role);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to assign role'
       );
     }
   }

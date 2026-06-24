@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { registerThunk, loginThunk, logoutThunk, fetchMeThunk } from './authThunk';
+import { registerThunk, loginThunk, logoutThunk, fetchMeThunk, loginWithOtpThunk } from './authThunk';
 import { getToken } from '../../utils/token';
 
 const initialState = {
@@ -22,6 +22,14 @@ const authSlice = createSlice({
       state.token = '';
       state.isAuthenticated = false;
       state.error = null;
+    },
+    updateCurrentUser: (state, action) => {
+      if (state.user) {
+        state.user = {
+          ...state.user,
+          ...action.payload,
+        };
+      }
     }
   },
   extraReducers: (builder) => {
@@ -51,6 +59,24 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
       })
       .addCase(loginThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.token = '';
+        state.isAuthenticated = false;
+      })
+
+      // Login with OTP
+      .addCase(loginWithOtpThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginWithOtpThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+      })
+      .addCase(loginWithOtpThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.token = '';
@@ -94,5 +120,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, resetAuthState } = authSlice.actions;
+export const { clearError, resetAuthState, updateCurrentUser } = authSlice.actions;
 export default authSlice.reducer;

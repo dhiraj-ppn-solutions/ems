@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { loginThunk, registerThunk, logoutThunk, fetchMeThunk } from '../store/auth/authThunk';
 import { clearError } from '../store/auth/authSlice';
@@ -6,12 +7,12 @@ export const useAuth = () => {
   const dispatch = useDispatch();
   const { user, token, isAuthenticated, loading, error } = useSelector((state) => state.auth);
 
-  const hasRole = (roleName) => {
+  const hasRole = useCallback((roleName) => {
     if (!user || !user.roles) return false;
     return user.roles.some((role) => role.name === roleName);
-  };
+  }, [user]);
 
-  const hasPermission = (permissionName) => {
+  const hasPermission = useCallback((permissionName) => {
     if (!user) return false;
     const hasDirect = user.permissions?.some((p) => p.name === permissionName);
     if (hasDirect) return true;
@@ -19,7 +20,7 @@ export const useAuth = () => {
       role.permissions?.some((p) => p.name === permissionName)
     );
     return !!hasRolePerm;
-  };
+  }, [user]);
 
   return {
     user,

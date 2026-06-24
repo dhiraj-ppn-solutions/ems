@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { fetchUsersThunk, deleteUserThunk } from '../../store/user/userThunk';
+import { toggleUserStatusApi } from '../../api/userApi';
 import UserTable from '../../components/User/UserTable';
 import UserSearch from '../../components/User/UserSearch';
 import UserPagination from '../../components/User/UserPagination';
@@ -13,10 +14,6 @@ const UserList = () => {
   const navigate = useNavigate();
   const { hasPermission, loading: authLoading } = useAuth();
   const { users, loading, pagination } = useSelector((state) => state.user);
-
-  if (!authLoading && !hasPermission('manage-users')) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   // Filter and pagination states
   const [search, setSearch] = useState('');
@@ -29,10 +26,18 @@ const UserList = () => {
   const [deleteTargetId, setDeleteTargetId] = useState(null);
   const [deleteTargetName, setDeleteTargetName] = useState('');
 
+  const hasManageUsers = hasPermission('manage-users');
+
   // Fetch users when parameters change
   useEffect(() => {
-    dispatch(fetchUsersThunk({ search, sort_by: sortBy, sort_order: sortOrder, page }));
-  }, [dispatch, search, sortBy, sortOrder, page]);
+    if (!authLoading && hasManageUsers) {
+      dispatch(fetchUsersThunk({ search, sort_by: sortBy, sort_order: sortOrder, page }));
+    }
+  }, [dispatch, search, sortBy, sortOrder, page, authLoading, hasManageUsers]);
+
+  if (!authLoading && !hasManageUsers) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleSearch = (query) => {
     setSearch(query);
@@ -83,6 +88,16 @@ const UserList = () => {
     }
   };
 
+  const handleToggleStatus = async (id) => {
+    try {
+      await toggleUserStatusApi(id);
+      // Re-fetch users to update view state
+      dispatch(fetchUsersThunk({ search, sort_by: sortBy, sort_order: sortOrder, page }));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update user status');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -116,6 +131,7 @@ const UserList = () => {
             onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDeleteTrigger}
+            onToggleStatus={handleToggleStatus}
           />
 
           <UserPagination

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView }) => {
+const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView, onToggleStatus }) => {
   const renderSortIndicator = (field) => {
     if (sortBy !== field) return null;
     return sortOrder === 'asc' ? ' ↑' : ' ↓';
@@ -38,6 +38,9 @@ const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView 
             >
               Registered Date{renderSortIndicator('created_at')}
             </th>
+            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
+              Status
+            </th>
             <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
               Actions
             </th>
@@ -46,7 +49,7 @@ const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView 
         <tbody className="bg-white divide-y divide-slate-200 text-sm text-slate-700">
           {users.length === 0 ? (
             <tr>
-              <td colSpan="6" className="px-6 py-10 text-center text-slate-400">
+              <td colSpan="7" className="px-6 py-10 text-center text-slate-400">
                 No users found.
               </td>
             </tr>
@@ -75,6 +78,20 @@ const UserTable = ({ users, onSort, sortBy, sortOrder, onEdit, onDelete, onView 
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
                   {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => onToggleStatus(user.id, user)}
+                    className="focus:outline-none transition hover:opacity-80"
+                  >
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-bold border cursor-pointer select-none ${
+                      user.is_active !== false
+                        ? 'bg-green-50 text-green-700 border-green-200'
+                        : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {user.is_active !== false ? '● Active' : '○ Inactive'}
+                    </span>
+                  </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
                   <button

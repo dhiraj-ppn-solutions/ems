@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -10,13 +10,17 @@ const PermissionList = () => {
   const { hasPermission, loading: authLoading } = useAuth();
   const { permissions, loading } = useSelector((state) => state.permission);
 
-  if (!authLoading && !hasPermission('manage-permissions')) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  const hasManagePermissions = hasPermission('manage-permissions');
 
   useEffect(() => {
-    permissionService.fetchPermissions();
-  }, []);
+    if (!authLoading && hasManagePermissions) {
+      permissionService.fetchPermissions();
+    }
+  }, [authLoading, hasManagePermissions]);
+
+  if (!authLoading && !hasManagePermissions) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleEdit = (id) => {
     navigate(`/permissions/${id}/edit`);

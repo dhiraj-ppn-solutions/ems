@@ -13,6 +13,8 @@ import Login from '../pages/Auth/Login';
 import Register from '../pages/Auth/Register';
 import ForgotPassword from '../pages/Auth/ForgotPassword';
 import ResetPassword from '../pages/Auth/ResetPassword';
+import VerifyEmailNotice from '../pages/Auth/VerifyEmailNotice';
+import Profile from '../pages/Auth/Profile';
 import Dashboard from '../pages/Dashboard';
 
 // Users pages
@@ -20,6 +22,8 @@ import UserList from '../pages/Users/UserList';
 import CreateUser from '../pages/Users/CreateUser';
 import EditUser from '../pages/Users/EditUser';
 import ViewUser from '../pages/Users/ViewUser';
+import UserRoleAssignment from '../pages/Users/UserRoleAssignment';
+import AuditLogs from '../pages/Audit/AuditLogs';
 
 // Roles pages
 import RoleList from '../pages/Roles/RoleList';
@@ -44,11 +48,20 @@ const AppRoutes = () => {
 
       {/* Protected Main Routes */}
       <Route element={<ProtectedRoute />}>
+        <Route path="/verify-email" element={
+          <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+            <VerifyEmailNotice />
+          </div>
+        } />
+
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/audit-logs" element={<AuditLogs />} />
           <Route path="/users" element={<UserList />} />
           <Route path="/users/create" element={<CreateUser />} />
+          <Route path="/users/assign-roles" element={<UserRoleAssignment />} />
           <Route path="/users/:id/edit" element={<EditUser />} />
           <Route path="/users/:id" element={<ViewUser />} />
 

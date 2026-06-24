@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -13,10 +13,6 @@ const RoleList = () => {
   const { roles, loading } = useSelector((state) => state.role);
   const { permissions } = useSelector((state) => state.permission);
 
-  if (!authLoading && !hasPermission('manage-roles')) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
   // Modal State
   const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [activeRoleId, setActiveRoleId] = useState(null);
@@ -24,10 +20,18 @@ const RoleList = () => {
   const [activeRolePermissions, setActiveRolePermissions] = useState([]);
   const [assignLoading, setAssignLoading] = useState(false);
 
+  const hasManageRoles = hasPermission('manage-roles');
+
   useEffect(() => {
-    roleService.fetchRoles();
-    permissionService.fetchPermissions();
-  }, []);
+    if (!authLoading && hasManageRoles) {
+      roleService.fetchRoles();
+      permissionService.fetchPermissions();
+    }
+  }, [authLoading, hasManageRoles]);
+
+  if (!authLoading && !hasManageRoles) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleEdit = (id) => {
     navigate(`/roles/${id}/edit`);

@@ -5,6 +5,7 @@ import {
   createUserThunk,
   updateUserThunk,
   deleteUserThunk,
+  assignUserRoleThunk,
 } from './userThunk';
 
 const initialState = {
@@ -107,6 +108,23 @@ const userSlice = createSlice({
         state.users = state.users.filter((u) => u.id !== action.payload);
       })
       .addCase(deleteUserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Assign User Role
+      .addCase(assignUserRoleThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(assignUserRoleThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedUser = action.payload.data;
+        state.users = state.users.map((u) =>
+          u.id === updatedUser.id ? updatedUser : u
+        );
+      })
+      .addCase(assignUserRoleThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

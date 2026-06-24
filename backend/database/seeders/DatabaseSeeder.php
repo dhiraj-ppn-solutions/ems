@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             'manage-roles',
             'manage-permissions',
             'view-dashboard',
+            'view-audit-logs',
         ];
 
         foreach ($permissions as $permName) {
@@ -38,37 +39,45 @@ class DatabaseSeeder extends Seeder
 
         // 3. Sync permissions to roles
         $superAdminRole->syncPermissions(Permission::where('guard_name', 'sanctum')->get());
-        $adminRole->syncPermissions(['manage-users', 'view-dashboard']);
+        $adminRole->syncPermissions(['manage-users', 'view-dashboard', 'view-audit-logs']);
         $employeeRole->syncPermissions(['view-dashboard']);
         $userRole->syncPermissions(['view-dashboard']);
 
         // 4. Create default users and assign roles
-        $superAdminUser = User::factory()->create([
-            'name' => 'Super Admin User',
+        $superAdminUser = User::firstOrCreate([
             'email' => 'superadmin@example.com',
+        ], [
+            'name' => 'Super Admin User',
             'password' => 'password',
+            'email_verified_at' => now(),
         ]);
-        $superAdminUser->assignRole($superAdminRole);
+        $superAdminUser->syncRoles([$superAdminRole]);
 
-        $adminUser = User::factory()->create([
-            'name' => 'Admin User',
+        $adminUser = User::firstOrCreate([
             'email' => 'admin@example.com',
+        ], [
+            'name' => 'Admin User',
             'password' => 'password',
+            'email_verified_at' => now(),
         ]);
-        $adminUser->assignRole($adminRole);
+        $adminUser->syncRoles([$adminRole]);
 
-        $employeeUser = User::factory()->create([
-            'name' => 'Employee User',
+        $employeeUser = User::firstOrCreate([
             'email' => 'employee@example.com',
+        ], [
+            'name' => 'Employee User',
             'password' => 'password',
+            'email_verified_at' => now(),
         ]);
-        $employeeUser->assignRole($employeeRole);
+        $employeeUser->syncRoles([$employeeRole]);
 
-        $visitorUser = User::factory()->create([
-            'name' => 'System Explorer',
+        $visitorUser = User::firstOrCreate([
             'email' => 'explorer@example.com',
+        ], [
+            'name' => 'System Explorer',
             'password' => 'password',
+            'email_verified_at' => now(),
         ]);
-        $visitorUser->assignRole($userRole);
+        $visitorUser->syncRoles([$userRole]);
     }
 }

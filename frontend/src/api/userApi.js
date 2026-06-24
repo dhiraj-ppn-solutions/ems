@@ -24,3 +24,13 @@ export const deleteUserApi = async (id) => {
   const response = await axiosClient.delete(`/users/${id}`);
   return response.data;
 };
+
+export const assignUserRoleApi = async (id, roleName) => {
+  const response = await axiosClient.post(`/users/${id}/role`, { role: roleName });
+  return response.data;
+};
+
+export const toggleUserStatusApi = async (id) => {
+  const response = await axiosClient.put(`/users/${id}/status`);
+  return response.data;
+};

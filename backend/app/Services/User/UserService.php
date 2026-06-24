@@ -45,6 +45,11 @@ class UserService
 
         $data['password'] = Hash::make($data['password']);
         $user = $this->userRepository->create($data);
+        
+        // Admin-created users are auto-verified
+        $user->email_verified_at = now();
+        $user->save();
+
         $user->assignRole($role);
 
         return $user->load('roles');

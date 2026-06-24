@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { registerApi, loginApi, logoutApi, fetchMeApi } from '../../api/authApi';
+import { registerApi, loginApi, logoutApi, fetchMeApi, loginWithOtpApi } from '../../api/authApi';
 import { setToken, removeToken } from '../../utils/token';
 
 export const registerThunk = createAsyncThunk(
@@ -26,6 +26,21 @@ export const loginThunk = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || error.response?.data?.errors || 'Login failed'
+      );
+    }
+  }
+);
+
+export const loginWithOtpThunk = createAsyncThunk(
+  'auth/loginWithOtp',
+  async ({ email_or_mobile, otp }, { rejectWithValue }) => {
+    try {
+      const data = await loginWithOtpApi(email_or_mobile, otp);
+      setToken(data.token);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.response?.data?.errors || 'OTP login failed'
       );
     }
   }
