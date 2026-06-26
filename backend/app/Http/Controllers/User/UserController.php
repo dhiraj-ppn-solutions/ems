@@ -36,8 +36,7 @@ class UserController extends Controller
 
         $this->auditLogService->log(
             'USER_CREATE',
-            "Created new system user: {$user->email}",
-            $user->id
+            "Created new system user: {$user->email}"
         );
 
         return (new UserResource($user))
@@ -58,8 +57,7 @@ class UserController extends Controller
 
         $this->auditLogService->log(
             'USER_UPDATE',
-            "Updated system user details for: {$user->email}",
-            $user->id
+            "Updated system user details for: {$user->email}"
         );
 
         return new UserResource($user);
@@ -72,8 +70,7 @@ class UserController extends Controller
 
         $this->auditLogService->log(
             'USER_DELETE',
-            "Deleted system user: {$user->email}",
-            $user->id
+            "Deleted system user: {$user->email}"
         );
 
         return response()->json([
@@ -104,8 +101,7 @@ class UserController extends Controller
 
         $this->auditLogService->log(
             'ROLE_ASSIGN',
-            "Assigned role '{$role}' to user: {$user->email}",
-            $user->id
+            "Assigned role '{$role}' to user: {$user->email}"
         );
 
         return new UserResource($user->load('roles'));
@@ -130,8 +126,7 @@ class UserController extends Controller
         $action = $user->is_active ? 'ACTIVATED' : 'DEACTIVATED';
         $this->auditLogService->log(
             'USER_STATUS_CHANGE',
-            "User account #{$user->id} ({$user->email}) was {$action}",
-            $user->id
+            "User account #{$user->id} ({$user->email}) was {$action}"
         );
 
         return new UserResource($user->load('roles'));
